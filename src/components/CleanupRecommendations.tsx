@@ -1,10 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { mockCleanupRecommendations, formatFileSize } from "@/data/mockData";
+import { useToast } from "@/hooks/use-toast";
 import { Sparkles, AlertTriangle, Info, Trash2, Eye, Play } from "lucide-react";
 
 export const CleanupRecommendations = () => {
+  const { toast } = useToast();
+
+  const handleCleanup = (recommendation: any) => {
+    toast({
+      title: "Cleanup Permission Required",
+      description: `To delete ${recommendation.fileCount} files and free ${formatFileSize(recommendation.potentialSavings)}, connect to Supabase for Google Drive API access.`,
+      variant: "destructive",
+    });
+  };
   const getRiskIcon = (level: string) => {
     switch (level) {
       case "low": return <Info className="h-4 w-4 text-success" />;
@@ -81,14 +92,36 @@ export const CleanupRecommendations = () => {
                 <Play className="h-3 w-3 mr-1" />
                 Simulate
               </Button>
-              <Button 
-                size="sm" 
-                variant={recommendation.riskLevel === "low" ? "default" : "outline"}
-                className="h-8"
-              >
-                <Trash2 className="h-3 w-3 mr-1" />
-                {recommendation.riskLevel === "low" ? "Safe Clean" : "Review"}
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    size="sm" 
+                    variant={recommendation.riskLevel === "low" ? "default" : "outline"}
+                    className="h-8"
+                  >
+                    <Trash2 className="h-3 w-3 mr-1" />
+                    {recommendation.riskLevel === "low" ? "Safe Clean" : "Review"}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirm Cleanup Action</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to {recommendation.title.toLowerCase()}? This will affect {recommendation.fileCount} files and potentially free {formatFileSize(recommendation.potentialSavings)} of space.
+                      <br /><br />
+                      <strong>Risk Level: {recommendation.riskLevel}</strong>
+                      <br />
+                      {recommendation.description}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleCleanup(recommendation)}>
+                      Proceed with Cleanup
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         ))}
