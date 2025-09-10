@@ -1,11 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { mockStorageStats, formatFileSize } from "@/data/mockData";
+import { formatFileSize } from "@/data/mockData";
 import { HardDrive, Database, FolderOpen } from "lucide-react";
+import { useRealTimeData } from "@/hooks/useRealTimeData";
 
 export const StorageOverview = () => {
-  const { totalSpace, usedSpace, availableSpace, breakdown } = mockStorageStats;
-  const usagePercentage = (usedSpace / totalSpace) * 100;
+  const { stats, breakdown, loading } = useRealTimeData();
+  
+  // Use real data or fallback to reasonable defaults
+  const totalSpace = 15 * 1024 * 1024 * 1024 * 1024; // 15TB typical Google Drive
+  const usedSpace = stats.totalSize || 0;
+  const availableSpace = totalSpace - usedSpace;
+  const usagePercentage = totalSpace > 0 ? (usedSpace / totalSpace) * 100 : 0;
 
   const fileTypeData = [
     { type: "Videos", size: breakdown.videos, color: "bg-file-videos", icon: "🎬" },
@@ -13,7 +19,39 @@ export const StorageOverview = () => {
     { type: "Documents", size: breakdown.documents, color: "bg-file-documents", icon: "📄" },
     { type: "Audio", size: breakdown.audio, color: "bg-file-audio", icon: "🎵" },
     { type: "Other", size: breakdown.other, color: "bg-file-other", icon: "📦" },
-  ];
+  ].filter(item => item.size > 0); // Only show types with data
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="md:col-span-2">
+          <CardContent className="p-6">
+            <div className="animate-pulse space-y-4">
+              <div className="h-4 bg-muted rounded w-1/3"></div>
+              <div className="h-3 bg-muted rounded"></div>
+              <div className="space-y-2">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-8 bg-muted rounded"></div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="animate-pulse space-y-2">
+                  <div className="h-4 bg-muted rounded w-1/2"></div>
+                  <div className="h-8 bg-muted rounded w-1/3"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -78,8 +116,8 @@ export const StorageOverview = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">127,432</div>
-            <p className="text-xs text-muted-foreground">Across all sources</p>
+            <div className="text-2xl font-bold text-foreground">{stats.totalFiles.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">In your Google Drive</p>
           </CardContent>
         </Card>
 
@@ -91,8 +129,8 @@ export const StorageOverview = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-warning">2,847</div>
-            <p className="text-xs text-muted-foreground">~{formatFileSize(5.2 * 1024 * 1024 * 1024)} potential savings</p>
+            <div className="text-2xl font-bold text-warning">{stats.duplicateCount.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">~{formatFileSize(stats.potentialSavings)} potential savings</p>
           </CardContent>
         </Card>
 
@@ -104,7 +142,7 @@ export const StorageOverview = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-success">{formatFileSize(25.7 * 1024 * 1024 * 1024)}</div>
+            <div className="text-2xl font-bold text-success">{formatFileSize(stats.potentialSavings)}</div>
             <p className="text-xs text-muted-foreground">Safe to remove</p>
           </CardContent>
         </Card>

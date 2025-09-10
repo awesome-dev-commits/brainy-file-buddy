@@ -14,7 +14,143 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      file_analysis: {
+        Row: {
+          analysis_type: string
+          confidence_score: number | null
+          created_at: string
+          file_id: string
+          id: string
+          metadata: Json | null
+          potential_savings_bytes: number | null
+          recommendation: string | null
+          user_id: string
+        }
+        Insert: {
+          analysis_type: string
+          confidence_score?: number | null
+          created_at?: string
+          file_id: string
+          id?: string
+          metadata?: Json | null
+          potential_savings_bytes?: number | null
+          recommendation?: string | null
+          user_id: string
+        }
+        Update: {
+          analysis_type?: string
+          confidence_score?: number | null
+          created_at?: string
+          file_id?: string
+          id?: string
+          metadata?: Json | null
+          potential_savings_bytes?: number | null
+          recommendation?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_analysis_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      files: {
+        Row: {
+          analysis_status: string | null
+          created_at: string
+          created_time: string | null
+          duplicate_group_id: string | null
+          google_drive_id: string
+          id: string
+          is_shared: boolean | null
+          last_accessed: string | null
+          metadata: Json | null
+          mime_type: string | null
+          modified_time: string | null
+          name: string
+          parent_folders: string[] | null
+          size_bytes: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_status?: string | null
+          created_at?: string
+          created_time?: string | null
+          duplicate_group_id?: string | null
+          google_drive_id: string
+          id?: string
+          is_shared?: boolean | null
+          last_accessed?: string | null
+          metadata?: Json | null
+          mime_type?: string | null
+          modified_time?: string | null
+          name: string
+          parent_folders?: string[] | null
+          size_bytes?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_status?: string | null
+          created_at?: string
+          created_time?: string | null
+          duplicate_group_id?: string | null
+          google_drive_id?: string
+          id?: string
+          is_shared?: boolean | null
+          last_accessed?: string | null
+          metadata?: Json | null
+          mime_type?: string | null
+          modified_time?: string | null
+          name?: string
+          parent_folders?: string[] | null
+          size_bytes?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          google_access_token: string | null
+          google_refresh_token: string | null
+          id: string
+          name: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          google_access_token?: string | null
+          google_refresh_token?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          google_access_token?: string | null
+          google_refresh_token?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
